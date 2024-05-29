@@ -8,28 +8,36 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+        
 
-class DataToArticle(models.Model):
-    ARTICLE_ELEMENT_TYPES = (
-        ('description', 'Description'),
-        ('image', 'Image'),
-        ('code', 'Code')
-    )
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='elements')
+class DescriptionToArticle(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='desc_elements')
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='article_image/', blank=True, null=True)
-    code = models.TextField(blank=True, null=True)
-    element_type = models.CharField(choices=ARTICLE_ELEMENT_TYPES, max_length=20)
-    order = models.PositiveIntegerField(default=0)
     
-    class Meta:
-        ordering = ['order']
+    def __str__(self) -> str:
+        return f'Content for {self.article.title}'
+    
+
+class ImageToArticle(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='img_elements')
+    image = models.ImageField(upload_to='article_image/', blank=True, null=True)
+    
+    def __str__(self) -> str:
+        return f'Image for {self.article.title}'
+    
+
+class CodeToArticle(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='code_elements')
+    description = models.TextField(blank=True, null=True)
+    
+    def __str__(self) -> str:
+        return f'Code for {self.article.title}'
     
 
 class Comment(models.Model):
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
-    upload_date = models.DateTimeField()
+    upload_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Comment on {self.article.title}'
